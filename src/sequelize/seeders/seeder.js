@@ -21,7 +21,6 @@ async function seed() {
         await sequelize.sync({ force: true });
         console.log('User table created');
 
-
         await Condition.bulkCreate([
             { id: 1, name: 'Brand New', value: 'brand_new'},
             { id: 2, name: 'As New', value: 'as_new'},
@@ -53,18 +52,18 @@ async function seed() {
                 id: 1,
                 name: 'MacBook Pro',
                 description: 'A laptop for developers',
-                condition: 1,
+                conditionId: 1,
                 image: 'macbook-pro.jpg',
-                userId: 2,
+                uid: 2,
                 wishlist: 'hair straightener, makeup kit'
             },
             {
                 id: 2,
                 name: 'iPhone 12',
                 description: 'A smartphone for developers',
-                condition: 1,
+                conditionId: 1,
                 image: 'iphone-12.jpg',
-                userId: 3,
+                uid: 3,
                 wishlist: 'macbook pro, ipad'
             },
         ])

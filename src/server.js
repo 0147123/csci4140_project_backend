@@ -7,6 +7,8 @@ const http = require('http')
 const cookieParser = require('cookie-parser')
 const sequelize = require('./sequelize/config/database')
 const userRoutes = require('./routes/users')
+const commentRoutes = require('./routes/comments')
+const itemRoutes = require('./routes/items')
 
 const app = express()
 const devPort = 3000
@@ -27,6 +29,7 @@ sequelize
   });
 
 // middleware
+app.use(express.json())
 app.use(bodyParser.json({ limit: "1mb", extended: true }))
 app.use(bodyParser.urlencoded({ limit: "1mb", extended: true }))
 app.use(cors(corsOptions))
@@ -34,6 +37,8 @@ app.use(cookieParser())
 
 // routes
 app.use('/users', userRoutes)
+app.use('/comments', commentRoutes)
+app.use('/items', itemRoutes)
 
 // for http
 var httpServer = http.createServer(app);

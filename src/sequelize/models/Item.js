@@ -17,7 +17,7 @@ const Item = sequelize.define('Item', {
     type: DataTypes.TEXT,
     allowNull: false,
   },
-  condition: {
+  conditionId: {
     type: DataTypes.INTEGER,
     allowNull: false,
     references: {
@@ -29,7 +29,7 @@ const Item = sequelize.define('Item', {
     type: DataTypes.STRING,
     allowNull: false,
   },
-  userId: {
+  uid: {
     type: DataTypes.INTEGER,
     allowNull: false,
     references: {
@@ -49,6 +49,20 @@ const Item = sequelize.define('Item', {
     type: DataTypes.DATE,
     defaultValue: DataTypes.NOW,
   },
+});
+
+User.hasMany(Item, {
+  foreignKey: 'uid',
+});
+Item.belongsTo(User, {
+  foreignKey: 'uid',
+});
+
+Condition.hasMany(Item, {
+  foreignKey: 'conditionId',
+});
+Item.belongsTo(Condition, {
+  foreignKey: 'id',
 });
 
 module.exports = Item;

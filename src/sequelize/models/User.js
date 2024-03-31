@@ -29,6 +29,11 @@ const User = sequelize.define('User', {
     allowNull: false,
     defaultValue: false,
   },
+  icon: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    defaultValue: 'default.png',
+  },
   createdAt: {
     type: DataTypes.DATE,
     defaultValue: DataTypes.NOW,

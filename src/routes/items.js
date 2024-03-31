@@ -1,13 +1,28 @@
 const express = require('express');
 const router = express.Router();
 const Item = require('../sequelize/models/Item');
+const Condition = require('../sequelize/models/Condition');
+const User = require('../sequelize/models/user');
 
 // Get all items
 router.get('/', async (req, res) => {
   try {
-    const items = await Item.findAll();
-    res.json(items);
+    const items = await Item.findAll({
+      attributes: ['id', 'name', 'image', 'createdAt'],
+      include: [
+        {
+          model: Condition,
+          attributes: ['name'],
+        },
+        {
+          model: User,
+          attributes: ['username'],
+        },
+      ],
+    });
+    res.status(200).json({items});
   } catch (error) {
+    console.log(error);
     res.status(500).json({ message: 'Failed to fetch items.' });
   }
 });
@@ -18,7 +33,7 @@ router.get('/:id', async (req, res) => {
 
   try {
     const item = await Item.findByPk(id);
-    res.json(item);
+    res.status(200).json({item});
   } catch (error) {
     res.status(500).json({ message: 'Failed to fetch item.' });
   }
@@ -26,11 +41,11 @@ router.get('/:id', async (req, res) => {
 
 // Create a new item
 router.post('/', async (req, res) => {
-  const { name, description, condition, image, userId, wishlist } = req.body;
+  const { name, description, condition, image, uid, wishlist } = req.body;
 
   try {
-    const item = await Item.create({ name, description, condition, image, userId, wishlist });
-    res.json(item);
+    const item = await Item.create({ name, description, condition, image, uid, wishlist });
+    res.status(201).json({item});
   } catch (error) {
     res.status(500).json({ message: 'Failed to create item.' });
   }
@@ -39,7 +54,7 @@ router.post('/', async (req, res) => {
 // Update an item
 router.put('/:id', async (req, res) => {
   const { id } = req.params;
-  const { name, description, condition, image, userId, wishlist } = req.body;
+  const { name, description, condition, image, uid, wishlist } = req.body;
 
   try {
     const item = await Item.findByPk(id);
@@ -47,11 +62,11 @@ router.put('/:id', async (req, res) => {
     item.description = description;
     item.condition = condition;
     item.image = image;
-    item.userId = userId;
+    item.uid = uid;
     item.wishlist = wishlist;
     await item.save();
 
-    res.json(item);
+    res.status(200).json({item});
   } catch (error) {
     res.status(500).json({ message: 'Failed to update item.' });
   }
@@ -65,7 +80,7 @@ router.delete('/:id', async (req, res) => {
     const item = await Item.findByPk(id);
     await item.destroy();
 
-    res.json({ message: 'Item deleted' });
+    res.status(200).json({ message: 'Item deleted' });
   } catch (error) {
     res.status(500).json({ message: 'Failed to delete item.' });
   }
