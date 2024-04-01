@@ -1,15 +1,27 @@
+const { Op } = require('sequelize');
+const Category = require('../sequelize/models/Category');
 const Condition = require('../sequelize/models/Condition');
 const Item = require('../sequelize/models/Item');
 const User = require('../sequelize/models/user');
 // itemController.js
 const getAllItems = async (req, res) => {
+  const { categoryId, keyword } = req.query;
+
   try {
     const items = await Item.findAll({
+      where: {
+        categoryId: categoryId ? categoryId : { [Op.not]: null },
+        name: keyword ? { [Op.like]: `%${keyword}%` } : { [Op.not]: null },
+      },
       attributes: ['id', 'name', 'image', 'createdAt'],
       include: [
         {
           model: Condition,
           attributes: ['name', 'value'],
+        },
+        {
+          model: Category,
+          attributes: ['id', 'name', 'value'],
         },
         {
           model: User,
@@ -35,6 +47,10 @@ const getItem = async (req, res) => {
           attributes: ['name', 'value'],
         },
         {
+          model: Category,
+          attributes: ['id', 'name', 'value'],
+        },
+        {
           model: User,
           attributes: ['username'],
         },
@@ -48,26 +64,25 @@ const getItem = async (req, res) => {
 
 const createItem = async (req, res) => {
 
-  console.log(req.body);
-  const { name, description, condition, uid, wishlist } = req.body;
+  const { name, description, condition, categoryId, uid, wishlist } = req.body;
 
   try {
-    console.log(req.file);
     if (!req.file) {
       return res.status(400).json({ error: 'No file uploaded' });
     }
 
-    console.log(condition);
     const conditionId = await Condition.findOne({ where: { value: condition } }).then((condition) => condition.id);
-
-    console.log(conditionId);
-    const item = await Item.create({ name, description, conditionId, image: req.file.path, uid, wishlist });
+    const item = await Item.create({ name, description, conditionId, categoryId, image: req.file.path, uid, wishlist });
 
     const resultItem = await Item.findByPk(item.id, {
       include: [
         {
           model: Condition,
           attributes: ['name', 'value'],
+        },
+        {
+          model: Category,
+          attributes: ['id', 'name', 'value'],
         },
         {
           model: User,
@@ -89,7 +104,7 @@ const updateItem = async (req, res) => {
 
   console.log(req.body);
   const { id } = req.params;
-  const { name, description, condition, uid, wishlist } = req.body;
+  const { name, description, condition, categoryId, uid, wishlist } = req.body;
 
   try {
 
@@ -99,6 +114,7 @@ const updateItem = async (req, res) => {
     const conditionId = await Condition.findOne({ where: { value: condition } }).then((condition) => condition.id);
     console.log(conditionId);
     item.conditionId = conditionId;
+    item.categoryId = categoryId;
     if (req.file) {
       item.image = req.file.path;
     }
@@ -112,6 +128,10 @@ const updateItem = async (req, res) => {
         {
           model: Condition,
           attributes: ['name', 'value'],
+        },
+        {
+          model: Category,
+          attributes: ['id', 'name', 'value'],
         },
         {
           model: User,
@@ -142,6 +162,19 @@ const deleteItem = async (req, res) => {
   }
 }
 
+const getAllCategories = async (req, res) => {
+  try {
+    console.log("categories");
+    const categories = await Category.findAll({
+      attributes: ['id', 'name', 'value'],
+    });
+    console.log(categories);
+    res.status(200).json({categories});
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to fetch categories.' });
+  }
+}
+
 
 module.exports = {
   getAllItems,
@@ -149,4 +182,5 @@ module.exports = {
   createItem,
   updateItem,
   deleteItem,
+  getAllCategories
 };

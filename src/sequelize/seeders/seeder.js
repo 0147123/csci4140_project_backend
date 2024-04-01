@@ -6,6 +6,7 @@ const Item = require('../models/Item');
 const ExchangeList = require('../models/ExchangeList');
 
 const bcrypt = require('bcrypt');
+const Category = require('../models/Category');
 
 async function encryptPassword(password) {
     return bcrypt.hash(password, 10);
@@ -21,6 +22,27 @@ async function seed() {
         await sequelize.sync({ force: true });
         console.log('User table created');
 
+        // Create categories
+        await Category.bulkCreate([
+            { id: 1, name: 'Electronics', value: 'electronics' },
+            { id: 2, name: 'Fashion', value: 'fashion' },
+            { id: 3, name: 'Home & Kitchen', value: 'home_kitchen' },
+            { id: 4, name: 'Books', value: 'books' },
+            { id: 5, name: 'Toys', value: 'toys' },
+            { id: 6, name: 'Sports', value: 'sports' },
+            { id: 7, name: 'Beauty', value: 'beauty' },
+            { id: 8, name: 'Health', value: 'health' },
+            { id: 9, name: 'Kids', value: 'kids' },
+            { id: 10, name: 'Others', value: 'others' },
+        ])
+            .then(() => {
+                console.log('Categories created');
+            })
+            .catch((error) => {
+                console.error('Error creating categories:', error);
+            });
+
+        // Create conditions
         await Condition.bulkCreate([
             { id: 1, name: 'Brand New', value: 'brand_new'},
             { id: 2, name: 'As New', value: 'as_new'},
@@ -53,18 +75,20 @@ async function seed() {
                 name: 'MacBook Pro',
                 description: 'A laptop for developers',
                 conditionId: 1,
-                image: 'macbook-pro.jpg',
+                image: 'uploads\\macbook-pro.jpg',
                 uid: 2,
-                wishlist: 'hair straightener, makeup kit'
+                wishlist: 'hair straightener, makeup kit',
+                categoryId: 1,
             },
             {
                 id: 2,
                 name: 'iPhone 12',
                 description: 'A smartphone for developers',
                 conditionId: 1,
-                image: 'iphone-12.jpg',
+                image: 'uploads\\iphone-12.jpg',
                 uid: 3,
-                wishlist: 'macbook pro, ipad'
+                wishlist: 'macbook pro, ipad',
+                categoryId: 1,
             },
         ])
             .then(() => {

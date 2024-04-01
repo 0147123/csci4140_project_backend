@@ -2,6 +2,7 @@ const { DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
 const Condition = require('./Condition');
 const User = require('./user');
+const Category = require('./Category');
 
 const Item = sequelize.define('Item', {
   id: {
@@ -22,6 +23,14 @@ const Item = sequelize.define('Item', {
     allowNull: false,
     references: {
       model: Condition,
+      key: 'id',
+    },
+  },
+  categoryId: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    references: {
+      model: Category,
       key: 'id',
     },
   },
@@ -63,6 +72,13 @@ Condition.hasMany(Item, {
 });
 Item.belongsTo(Condition, {
   foreignKey: 'conditionId',
+});
+
+Category.hasMany(Item, {
+  foreignKey: 'categoryId',
+});
+Item.belongsTo(Category, {
+  foreignKey: 'categoryId',
 });
 
 module.exports = Item;

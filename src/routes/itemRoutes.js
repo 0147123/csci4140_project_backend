@@ -4,6 +4,7 @@ const itemController = require('../controllers/itemController');
 
 // Define routes
 router.get('/', itemController.getAllItems);
+router.get('/categories', itemController.getAllCategories);
 router.get('/:id', itemController.getItem);
 router.post('/', itemController.createItem);
 router.put('/:id', itemController.updateItem);
