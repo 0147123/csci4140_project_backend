@@ -62,7 +62,7 @@ Condition.hasMany(Item, {
   foreignKey: 'conditionId',
 });
 Item.belongsTo(Condition, {
-  foreignKey: 'id',
+  foreignKey: 'conditionId',
 });
 
 module.exports = Item;

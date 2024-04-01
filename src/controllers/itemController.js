@@ -9,7 +9,7 @@ const getAllItems = async (req, res) => {
       include: [
         {
           model: Condition,
-          attributes: ['name'],
+          attributes: ['name', 'value'],
         },
         {
           model: User,
@@ -32,7 +32,7 @@ const getItem = async (req, res) => {
       include: [
         {
           model: Condition,
-          attributes: ['name'],
+          attributes: ['name', 'value'],
         },
         {
           model: User,
@@ -47,6 +47,8 @@ const getItem = async (req, res) => {
 }
 
 const createItem = async (req, res) => {
+
+  console.log(req.body);
   const { name, description, condition, uid, wishlist } = req.body;
 
   try {
@@ -54,33 +56,74 @@ const createItem = async (req, res) => {
     if (!req.file) {
       return res.status(400).json({ error: 'No file uploaded' });
     }
-    const item = await Item.create({ name, description, condition, image: req.file.path, uid, wishlist });
-    res.status(201).json({ item });
+
+    console.log(condition);
+    const conditionId = await Condition.findOne({ where: { value: condition } }).then((condition) => condition.id);
+
+    console.log(conditionId);
+    const item = await Item.create({ name, description, conditionId, image: req.file.path, uid, wishlist });
+
+    const resultItem = await Item.findByPk(item.id, {
+      include: [
+        {
+          model: Condition,
+          attributes: ['name', 'value'],
+        },
+        {
+          model: User,
+          attributes: ['username'],
+        },
+      ],
+    });
+
+    console.log(item);
+    res.status(201).json({ item: resultItem });
   } catch (error) {
+    console.log(error)
     res.status(500).json({ message: 'Failed to create item.' });
   }
 }
 
 const updateItem = async (req, res) => {
+  console.log(req.file);
+
+  console.log(req.body);
   const { id } = req.params;
   const { name, description, condition, uid, wishlist } = req.body;
 
   try {
-    console.log(req.file);
-    if (!req.file) {
-      return res.status(400).json({ error: 'No file uploaded' });
-    }
 
     const item = await Item.findByPk(id);
     item.name = name;
     item.description = description;
-    item.condition = condition;
-    item.image = req.file.path;
+    const conditionId = await Condition.findOne({ where: { value: condition } }).then((condition) => condition.id);
+    console.log(conditionId);
+    item.conditionId = conditionId;
+    if (req.file) {
+      item.image = req.file.path;
+    }
     item.uid = uid;
     item.wishlist = wishlist;
     await item.save();
+    console.log("item");
+    console.log(item);
+    const resultItem = await Item.findByPk(item.id, {
+      include: [
+        {
+          model: Condition,
+          attributes: ['name', 'value'],
+        },
+        {
+          model: User,
+          attributes: ['username'],
+        },
+      ],
+    });
 
-    res.status(200).json({ item });
+    console.log("resultItem");
+    console.log(resultItem.dataValues);
+
+    res.status(200).json({ item: resultItem });
   } catch (error) {
     res.status(500).json({ message: 'Failed to update item.' });
   }
