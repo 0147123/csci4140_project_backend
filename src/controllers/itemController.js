@@ -1,11 +1,8 @@
-const express = require('express');
-const router = express.Router();
-const Item = require('../sequelize/models/Item');
 const Condition = require('../sequelize/models/Condition');
+const Item = require('../sequelize/models/Item');
 const User = require('../sequelize/models/user');
-
-// Get all items
-router.get('/', async (req, res) => {
+// itemController.js
+const getAllItems = async (req, res) => {
   try {
     const items = await Item.findAll({
       attributes: ['id', 'name', 'image', 'createdAt'],
@@ -25,10 +22,9 @@ router.get('/', async (req, res) => {
     console.log(error);
     res.status(500).json({ message: 'Failed to fetch items.' });
   }
-});
+};
 
-// Get an item by id
-router.get('/:id', async (req, res) => {
+const getItem = async (req, res) => {
   const { id } = req.params;
 
   try {
@@ -48,31 +44,38 @@ router.get('/:id', async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: 'Failed to fetch item.' });
   }
-});
+}
 
-// Create a new item
-router.post('/', async (req, res) => {
-  const { name, description, condition, image, uid, wishlist } = req.body;
+const createItem = async (req, res) => {
+  const { name, description, condition, uid, wishlist } = req.body;
 
   try {
-    const item = await Item.create({ name, description, condition, image, uid, wishlist });
+    console.log(req.file);
+    if (!req.file) {
+      return res.status(400).json({ error: 'No file uploaded' });
+    }
+    const item = await Item.create({ name, description, condition, image: req.file.path, uid, wishlist });
     res.status(201).json({ item });
   } catch (error) {
     res.status(500).json({ message: 'Failed to create item.' });
   }
-});
+}
 
-// Update an item
-router.put('/:id', async (req, res) => {
+const updateItem = async (req, res) => {
   const { id } = req.params;
-  const { name, description, condition, image, uid, wishlist } = req.body;
+  const { name, description, condition, uid, wishlist } = req.body;
 
   try {
+    console.log(req.file);
+    if (!req.file) {
+      return res.status(400).json({ error: 'No file uploaded' });
+    }
+
     const item = await Item.findByPk(id);
     item.name = name;
     item.description = description;
     item.condition = condition;
-    item.image = image;
+    item.image = req.file.path;
     item.uid = uid;
     item.wishlist = wishlist;
     await item.save();
@@ -81,10 +84,9 @@ router.put('/:id', async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: 'Failed to update item.' });
   }
-});
+}
 
-// Delete an item
-router.delete('/:id', async (req, res) => {
+const deleteItem = async (req, res) => {
   const { id } = req.params;
 
   try {
@@ -95,6 +97,13 @@ router.delete('/:id', async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: 'Failed to delete item.' });
   }
-});
+}
 
-module.exports = router;
+
+module.exports = {
+  getAllItems,
+  getItem,
+  createItem,
+  updateItem,
+  deleteItem,
+};

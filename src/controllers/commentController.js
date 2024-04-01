@@ -1,9 +1,6 @@
-const express = require('express');
-const router = express.Router();
 const Comment = require('../sequelize/models/Comment');
 
-// Get all comments
-router.get('/:id', async (req, res) => {
+const getComment = async (req, res) => {
   try {
     const { id } = req.params;
     const comments = await Comment.findAll({
@@ -13,30 +10,29 @@ router.get('/:id', async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: 'Failed to fetch comments.' });
   }
-});
+}
 
-// Create a new comment
-router.post('/', async (req, res) => {
-  const { uid, itemId, rating, image } = req.body;
+const createComment = async (req, res) => {
+  const { uid, commentId, rating, image } = req.body;
 
   try {
-    const comment = await Comment.create({ uid, itemId, rating, image });
+    const comment = await Comment.create({ uid, commentId, rating, image });
     res.status(201).json({comment});
   } catch (error) {
     res.status(500).json({ message: 'Failed to create comment.' });
   }
 
-});
+}
 
-// Update a comment
-router.put('/:id', async (req, res) => {
+const updateComment = async (req, res) => {
+  
   const { id } = req.params;
-  const { uid, itemId, rating, image } = req.body;
+  const { uid, commentId, rating, image } = req.body;
 
   try {
     const comment = await Comment.findByPk(id);
     comment.uid = uid;
-    comment.itemId = itemId;
+    comment.commentId = commentId;
     comment.rating = rating;
     comment.image = image;
     await comment.save();
@@ -45,10 +41,9 @@ router.put('/:id', async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: 'Failed to update comment.' });
   }
-});
+}
 
-// Delete a comment
-router.delete('/:id', async (req, res) => {
+const deleteComment = async (req, res) => {
   const { id } = req.params;
 
   try {
@@ -59,6 +54,12 @@ router.delete('/:id', async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: 'Failed to delete comment.' });
   }
-});
+}
 
-module.exports = router;
+
+module.exports = {
+  getComment,
+  createComment,
+  updateComment,
+  deleteComment,
+};

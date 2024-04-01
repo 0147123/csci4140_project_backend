@@ -6,9 +6,10 @@ const cors = require('cors')
 const http = require('http')
 const cookieParser = require('cookie-parser')
 const sequelize = require('./sequelize/config/database')
-const userRoutes = require('./routes/users')
-const commentRoutes = require('./routes/comments')
-const itemRoutes = require('./routes/items')
+const userRoutes = require('./routes/userRoutes')
+const commentRoutes = require('./routes/commentRoutes')
+const itemRoutes = require('./routes/itemRoutes')
+const multerMiddleware = require('./middlewares/multer')
 
 const app = express()
 const devPort = 3000
@@ -34,6 +35,8 @@ app.use(bodyParser.json({ limit: "1mb", extended: true }))
 app.use(bodyParser.urlencoded({ limit: "1mb", extended: true }))
 app.use(cors(corsOptions))
 app.use(cookieParser())
+app.use(multerMiddleware.single('img')); 
+app.use('/uploads', express.static('uploads'));
 
 // routes
 app.use('/users', userRoutes)
