@@ -20,7 +20,7 @@ router.get('/', async (req, res) => {
         },
       ],
     });
-    res.status(200).json({items});
+    res.status(200).json({ items });
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: 'Failed to fetch items.' });
@@ -32,8 +32,19 @@ router.get('/:id', async (req, res) => {
   const { id } = req.params;
 
   try {
-    const item = await Item.findByPk(id);
-    res.status(200).json({item});
+    const item = await Item.findByPk(id, {
+      include: [
+        {
+          model: Condition,
+          attributes: ['name'],
+        },
+        {
+          model: User,
+          attributes: ['username'],
+        },
+      ],
+    });
+    res.status(200).json({ item });
   } catch (error) {
     res.status(500).json({ message: 'Failed to fetch item.' });
   }
@@ -45,7 +56,7 @@ router.post('/', async (req, res) => {
 
   try {
     const item = await Item.create({ name, description, condition, image, uid, wishlist });
-    res.status(201).json({item});
+    res.status(201).json({ item });
   } catch (error) {
     res.status(500).json({ message: 'Failed to create item.' });
   }
@@ -66,7 +77,7 @@ router.put('/:id', async (req, res) => {
     item.wishlist = wishlist;
     await item.save();
 
-    res.status(200).json({item});
+    res.status(200).json({ item });
   } catch (error) {
     res.status(500).json({ message: 'Failed to update item.' });
   }
