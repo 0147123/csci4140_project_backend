@@ -1,7 +1,7 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
 const User = require('./user');
-const MessageType = require('./MessageType');
+const Conversation = require('./Conversation');
 
 const Message = sequelize.define('Message', {
   id: {
@@ -13,15 +13,7 @@ const Message = sequelize.define('Message', {
     type: DataTypes.TEXT,
     allowNull: false,
   },
-  sender: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-    references: {
-      model: User,
-      key: 'uid',
-    },
-  },
-  receiver: {
+  uid: {
     type: DataTypes.INTEGER,
     allowNull: false,
     references: {
@@ -30,10 +22,14 @@ const Message = sequelize.define('Message', {
     },
   },
   type: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  conversationId: {
     type: DataTypes.INTEGER,
     allowNull: false,
     references: {
-      model: MessageType,
+      model: Conversation,
       key: 'id',
     },
   },
@@ -46,5 +42,15 @@ const Message = sequelize.define('Message', {
     defaultValue: DataTypes.NOW,
   },
 });
+
+Message.belongsTo(User, { foreignKey: 'uid' });
+Message.belongsTo(Conversation, { foreignKey: 'conversationId' });
+
+User.hasMany(Message, { foreignKey: 'uid' });
+Conversation.hasMany(Message, { foreignKey: 'conversationId' });
+
+
+
+
 
 module.exports = Message;

@@ -7,6 +7,8 @@ const ExchangeList = require('../models/ExchangeList');
 
 const bcrypt = require('bcrypt');
 const Category = require('../models/Category');
+const Conversation = require('../models/Conversation');
+const Message = require('../models/Message');
 
 async function encryptPassword(password) {
     return bcrypt.hash(password, 10);
@@ -115,6 +117,43 @@ async function seed() {
             })
             .catch((error) => {
                 console.error('Error creating exchange lists:', error);
+            });
+
+        await Conversation.bulkCreate([
+            {
+                id: 1,
+                uid1: 2,
+                uid2: 3,
+            },
+        ])
+            .then(() => {
+                console.log('Conversations created');
+            })
+            .catch((error) => {
+                console.error('Error creating conversations:', error);
+            });
+
+        await Message.bulkCreate([
+            {
+                id: 1,
+                content: 'Hello',
+                uid: 2,
+                type: 'text',
+                conversationId: 1,
+            },
+            {
+                id: 2,
+                content: 'Hi',
+                uid: 3,
+                type: 'text',
+                conversationId: 1,
+            },
+        ])
+            .then(() => {
+                console.log('Messages created');
+            })
+            .catch((error) => {
+                console.error('Error creating messages:', error);
             });
         
 

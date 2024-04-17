@@ -9,6 +9,7 @@ const sequelize = require('./sequelize/config/database')
 const userRoutes = require('./routes/userRoutes')
 const commentRoutes = require('./routes/commentRoutes')
 const itemRoutes = require('./routes/itemRoutes')
+const messageRoutes = require('./routes/messageRoutes')
 const multerMiddleware = require('./middlewares/multer')
 
 const app = express()
@@ -42,6 +43,7 @@ app.use('/uploads', express.static('uploads'));
 app.use('/users', userRoutes)
 app.use('/comments', commentRoutes)
 app.use('/items', itemRoutes)
+app.use('/messages', messageRoutes)
 
 // for http
 var httpServer = http.createServer(app);
