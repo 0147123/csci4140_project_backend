@@ -1,3 +1,5 @@
+const Category = require("../sequelize/models/Category");
+const Condition = require("../sequelize/models/Condition");
 const Item = require("../sequelize/models/Item");
 const Request = require("../sequelize/models/Request");
 const User = require("../sequelize/models/user");
@@ -29,53 +31,105 @@ const getRequests = async (req, res) => {
   }
 }
 
-const acceptRequest = async (req, res) => {
+const getRequest = async (req, res) => {
   const { id } = req.params;
+
+  try {
+    const request = await Request.findByPk(id, {
+      include: [
+        {
+          model: Item,
+          as: 'availableItem',
+          include: [
+            {
+              model: User,
+              attributes: ['uid', 'username'],
+            },
+            {
+              model: Condition,
+              attributes: ['name', 'value'],
+            },
+            {
+              model: Category,
+              attributes: ['id', 'name', 'value'],
+            }
+          ],
+        },
+      ],
+    });
+    res.status(200).json({ request });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: 'Failed to fetch request.' });
+  }
+}
+
+const createRequest = async (req, res) => {
+  const { uid, itemId, availableItemIds } = req.body;
+
+  try {
+    availableItemIds.forEach(async (id) => {
+      await Request.create({
+        uid,
+        itemId,
+        availableItemIds,
+      });
+    });
+    res.status(201).json({ message: 'Request created'});
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: 'Failed to create request.' });
+  }
+}
+
+const updateRequestStatus = async (req, res) => {
+  const { id } = req.params;
+  const { status } = req.body;
 
   try {
     const request = await Request.findByPk(id);
     const item = await Item.findByPk(request.itemId);
     const availableItem = await Item.findByPk(request.availableItemId);
 
-    item.status = 'requested';
-    availableItem.status = 'requested';
-    request.status = 'accepted';
+    if (status === 'accepted') {
+      item.status = 'requested';
+      availableItem.status = 'requested';
+      request.status = 'accepted';
+    } else {
+      request.status = 'rejected';
+    }
 
+    await request.save();
     await item.save();
     await availableItem.save();
 
-    res.status(200).json({ message: 'Request accepted' });
+    const result = await Request.findByPk(id, {
+      include: [
+        {
+          model: Item,
+          as: 'availableItem',
+          include: [
+            {
+              model: User,
+              attributes: ['uid', 'username'],
+            },
+            {
+              model: Condition,
+              attributes: ['name', 'value'],
+            },
+            {
+              model: Category,
+              attributes: ['id', 'name', 'value'],
+            }
+          ],
+        },
+      ],
+    });
+
+    res.status(200).json({ request: result });
   } catch (error) {
+    console.log(error)
     res.status(500).json({ message: 'Failed to accept request.' });
-  }
-}
-
-const rejectRequest = async (req, res) => {
-  const { id } = req.params;
-
-  try {
-    const request = await Request.findByPk(id);
-    request.status = 'rejected';
-    await request.save();
-
-    res.status(200).json({ message: 'Request rejected' });
-  } catch (error) {
-    res.status(500).json({ message: 'Failed to reject request.' });
-  }
-}
-
-const createRequest = async (req, res) => {
-  const { uid, itemId, availableItemId } = req.body;
-
-  try {
-    const request = await Request.create({ 
-      uid, 
-      itemId, 
-      availableItemId,
-     });
-    res.status(201).json({request});
-  } catch (error) {
-    res.status(500).json({ message: 'Failed to create request.' });
   }
 }
 
@@ -95,6 +149,8 @@ const deleteRequest = async (req, res) => {
 
 module.exports = {
   getRequests,
+  getRequest,
   createRequest,
+  updateRequestStatus,
   deleteRequest,
 };

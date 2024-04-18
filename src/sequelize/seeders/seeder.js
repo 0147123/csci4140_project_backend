@@ -108,12 +108,14 @@ async function seed() {
                 itemId: 1,
                 uid: 2,
                 availableItemId: 2,
+                status: 'pending',
             },
             {
                 id: 2,
                 itemId: 2,
                 uid: 3,
                 availableItemId: 1,
+                status: 'pending',
             },
         ])
             .then(() => {
