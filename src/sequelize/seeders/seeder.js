@@ -3,7 +3,7 @@ const sequelize = require('../config/database');
 const Condition = require('../models/Condition');
 const User = require('../models/user');
 const Item = require('../models/Item');
-const ExchangeList = require('../models/ExchangeList');
+const Request = require('../models/Request');
 
 const bcrypt = require('bcrypt');
 const Category = require('../models/Category');
@@ -81,6 +81,7 @@ async function seed() {
                 uid: 2,
                 wishlist: 'hair straightener, makeup kit',
                 categoryId: 1,
+                status: 'available',
             },
             {
                 id: 2,
@@ -91,6 +92,7 @@ async function seed() {
                 uid: 3,
                 wishlist: 'macbook pro, ipad',
                 categoryId: 1,
+                status: 'available',
             },
         ])
             .then(() => {
@@ -100,23 +102,25 @@ async function seed() {
                 console.error('Error creating items:', error);
             });
         
-        await ExchangeList.bulkCreate([
+        await Request.bulkCreate([
             {
                 id: 1,
                 itemId: 1,
+                uid: 2,
                 availableItemId: 2,
             },
             {
                 id: 2,
                 itemId: 2,
+                uid: 3,
                 availableItemId: 1,
             },
         ])
             .then(() => {
-                console.log('Exchange lists created');
+                console.log('Request created');
             })
             .catch((error) => {
-                console.error('Error creating exchange lists:', error);
+                console.error('Error creating request:', error);
             });
 
         await Conversation.bulkCreate([

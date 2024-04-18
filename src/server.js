@@ -10,6 +10,7 @@ const userRoutes = require('./routes/userRoutes')
 const commentRoutes = require('./routes/commentRoutes')
 const itemRoutes = require('./routes/itemRoutes')
 const messageRoutes = require('./routes/messageRoutes')
+const requestRoutes = require('./routes/requestRoutes')
 const multerMiddleware = require('./middlewares/multer')
 
 const app = express()
@@ -44,6 +45,7 @@ app.use('/users', userRoutes)
 app.use('/comments', commentRoutes)
 app.use('/items', itemRoutes)
 app.use('/messages', messageRoutes)
+app.use('/requests', requestRoutes)
 
 // for http
 var httpServer = http.createServer(app);

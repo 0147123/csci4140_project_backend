@@ -38,6 +38,11 @@ const Item = sequelize.define('Item', {
     type: DataTypes.STRING,
     allowNull: false,
   },
+  status: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    defaultValue: 'available',
+  },
   uid: {
     type: DataTypes.INTEGER,
     allowNull: false,
