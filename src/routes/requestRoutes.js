@@ -6,6 +6,7 @@ const requestController = require('../controllers/requestController');
 router.get('/all/:itemId', requestController.getRequests);
 router.get('/:id', requestController.getRequest);
 router.post('/', requestController.createRequest );
+router.put('/', requestController.updateRequest);
 router.put('/:id', requestController.updateRequestStatus);
 router.delete('/:id', requestController.deleteRequest);
 

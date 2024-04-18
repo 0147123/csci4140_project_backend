@@ -1,3 +1,4 @@
+const { Op } = require("sequelize");
 const Category = require("../sequelize/models/Category");
 const Condition = require("../sequelize/models/Condition");
 const Item = require("../sequelize/models/Item");
@@ -7,8 +8,12 @@ const User = require("../sequelize/models/user");
 const getRequests = async (req, res) => {
   try {
     const { itemId } = req.params;
+    const { uid } = req.query;
     const requests = await Request.findAll({
-      where: { itemId },
+      where: {
+        itemId,
+        uid: uid ? uid : { [Op.not]: null },
+      },
       include: [
         {
           model: Item,
@@ -72,10 +77,10 @@ const createRequest = async (req, res) => {
       await Request.create({
         uid,
         itemId,
-        availableItemIds,
+        availableItemId: id,
       });
     });
-    res.status(201).json({ message: 'Request created'});
+    res.status(201).json({ message: 'Request created' });
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: 'Failed to create request.' });
@@ -133,6 +138,34 @@ const updateRequestStatus = async (req, res) => {
   }
 }
 
+const updateRequest = async (req, res) => {
+  const { uid, itemId, availableItemIds } = req.body;
+
+  console.log(availableItemIds)
+  try {
+    const requests = await Request.findAll({
+      where: { uid, itemId },
+    });
+
+    requests.forEach(async (request) => {
+      await request.destroy();
+    });
+
+    availableItemIds.forEach(async (id) => {
+      await Request.create({
+        uid,
+        itemId,
+        availableItemId: id,
+      });
+    });
+
+    res.status(200).json({ message: 'Requests updated'});
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: 'Failed to update requests.' });
+  }
+}
+
 const deleteRequest = async (req, res) => {
   const { id } = req.params;
 
@@ -152,5 +185,6 @@ module.exports = {
   getRequest,
   createRequest,
   updateRequestStatus,
+  updateRequest,
   deleteRequest,
 };
