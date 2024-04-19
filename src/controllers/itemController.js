@@ -173,7 +173,6 @@ const deleteItem = async (req, res) => {
 
 const getAllCategories = async (req, res) => {
   try {
-    console.log("categories");
     const categories = await Category.findAll({
       attributes: ['id', 'name', 'value'],
     });

@@ -141,7 +141,6 @@ const updateRequestStatus = async (req, res) => {
 const updateRequest = async (req, res) => {
   const { uid, itemId, availableItemIds } = req.body;
 
-  console.log(availableItemIds)
   try {
     const requests = await Request.findAll({
       where: { uid, itemId },

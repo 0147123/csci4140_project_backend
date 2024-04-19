@@ -16,18 +16,13 @@ const getConversations = async (req, res) => {
             { uid2: uid },
           ]
         },
+        attributes: ['id', 'uid1', 'uid2'],
         include: [
           {
             model: Message,
             order: [['createdAt', 'DESC']],
             limit: 1,
             attributes: ['content', 'type', 'createdAt'],
-            include: [
-              {
-                model: User,
-                attributes: ['username', 'icon'],
-              },
-            ],
           },
           {
             model: User,
@@ -42,11 +37,89 @@ const getConversations = async (req, res) => {
         ],
       }
     );
+
     res.status(200).json({ conversations });
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: 'Failed to fetch conversations.' });
   }
+}
+
+const checkOrCreateConversation = async (req, res) => {
+  try {
+    const { uid1, uid2 } = req.query;
+    const conversation = await Conversation.findOne({
+      where: {
+        [Op.or]: [
+          { uid1, uid2 },
+          { uid1: uid2, uid2: uid1 },
+        ],
+      },
+      attributes: ['id', 'uid1', 'uid2'],
+      include: [
+        {
+          model: Message,
+          order: [['createdAt', 'DESC']],
+          limit: 1,
+          attributes: ['content', 'type', 'createdAt'],
+        },
+        {
+          model: User,
+          as: 'user1',
+          attributes: ['uid', 'username', 'icon'],
+        },
+        {
+          model: User,
+          as: 'user2',
+          attributes: ['uid', 'username', 'icon'],
+        }
+      ],
+    });
+
+    if (conversation) {
+      res.status(200).json({ conversation: conversation });
+      return;
+    }
+
+    const newConversation = await Conversation.create({
+      uid1,
+      uid2,
+    });
+    
+    const resultConversation = await Conversation.findOne(
+      {
+        where:
+        {
+          id: newConversation.id
+        },
+        attributes: ['id', 'uid1', 'uid2'],
+        include: [
+          {
+            model: Message,
+            order: [['createdAt', 'DESC']],
+            limit: 1,
+            attributes: ['content', 'type', 'createdAt'],
+          },
+          {
+            model: User,
+            as: 'user1',
+            attributes: ['uid', 'username', 'icon'],
+          },
+          {
+            model: User,
+            as: 'user2',
+            attributes: ['uid', 'username', 'icon'],
+          }
+        ],
+      }
+    );
+
+    res.status(201).json({ conversation: resultConversation });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: 'Failed to fetch conversations.' });
+  }
+
 }
 
 const getMessages = async (req, res) => {
@@ -91,6 +164,7 @@ const createMessage = async (req, res) => {
 
 module.exports = {
   getConversations,
+  checkOrCreateConversation,
   getMessages,
   createMessage,
 };
