@@ -34,6 +34,10 @@ const User = sequelize.define('User', {
     allowNull: false,
     defaultValue: 'default.png',
   },
+  fcmToken: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
   createdAt: {
     type: DataTypes.DATE,
     defaultValue: DataTypes.NOW,

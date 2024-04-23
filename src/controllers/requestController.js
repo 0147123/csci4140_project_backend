@@ -5,6 +5,7 @@ const Item = require("../sequelize/models/Item");
 const Request = require("../sequelize/models/Request");
 const User = require("../sequelize/models/user");
 const Notification = require("../sequelize/models/Notification");
+const admin = require('firebase-admin');
 
 const getRequests = async (req, res) => {
   try {
@@ -82,13 +83,29 @@ const createRequest = async (req, res) => {
       });
     });
 
-    const item = await Item.findByPk(itemId);
+    const item = await Item.findByPk(itemId,
+      {
+        include: [
+          {
+            model: User,
+            attributes: ['fcmToken'],
+          },
+        ],
+      });
     const user = await User.findByPk(uid);
 
     await Notification.create({
       content: 'You have a new request on your item ' + item.name + ' from ' + user.username,
       uid: item.uid,
     });
+
+    await admin.messaging().send({
+      notification: {
+        title: 'New Request',
+        body: 'You have a new request on your item ' + item.name + ' from ' + user.username,
+      },
+      token: "cEvpG3wdSJ6O4JSCSpg-Ea:APA91bGqnbuhfIZBWnSP7RtwdFD4fWb0Q2jdu7L3Y4gfDDrtNLaotwdgPFz52opu8adjLhKphveCvM2XWUrfMbfKD16VrbNLSnaeClJ7_VlbRzeIAQ9wcEqPntEBpuRmUeQiTCWM7Upn",
+    })
 
     res.status(201).json({ message: 'Request created' });
   } catch (error) {
@@ -149,17 +166,18 @@ const updateRequestStatus = async (req, res) => {
       ],
     });
 
-    if (status === 'accepted') {
-      await Notification.create({
-        content: 'Your request on the item ' + item.name + ' has been accepted by ' + item.User.username,
-        uid: request.uid,
-      });
-    } else {
-      await Notification.create({
-        content: 'Your request on the item ' + item.name + ' has been rejected by ' + item.User.username,
-        uid: request.uid,
-      });
-    }
+    await Notification.create({
+      content: 'Your request on the item ' + item.name + ' has been ' + status + ' by ' + item.User.username,
+      uid: request.uid,
+    });
+
+    await admin.messaging().send({
+      notification: {
+        title: 'New Request',
+        body: 'Your request on the item ' + item.name + ' has been ' + status + ' by ' + item.User.username,
+      },
+      token: "cEvpG3wdSJ6O4JSCSpg-Ea:APA91bGqnbuhfIZBWnSP7RtwdFD4fWb0Q2jdu7L3Y4gfDDrtNLaotwdgPFz52opu8adjLhKphveCvM2XWUrfMbfKD16VrbNLSnaeClJ7_VlbRzeIAQ9wcEqPntEBpuRmUeQiTCWM7Upn",
+    })
 
     res.status(200).json({ request: result });
   } catch (error) {
@@ -196,7 +214,15 @@ const updateRequest = async (req, res) => {
       uid: item.uid,
     });
 
-    res.status(200).json({ message: 'Requests updated'});
+    await admin.messaging().send({
+      notification: {
+        title: 'New Request',
+        body: 'You have a new request on your item ' + item.name + ' from ' + user.username,
+      },
+      token: "cEvpG3wdSJ6O4JSCSpg-Ea:APA91bGqnbuhfIZBWnSP7RtwdFD4fWb0Q2jdu7L3Y4gfDDrtNLaotwdgPFz52opu8adjLhKphveCvM2XWUrfMbfKD16VrbNLSnaeClJ7_VlbRzeIAQ9wcEqPntEBpuRmUeQiTCWM7Upn",
+    })
+
+    res.status(200).json({ message: 'Requests updated' });
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: 'Failed to update requests.' });

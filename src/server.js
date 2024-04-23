@@ -49,6 +49,13 @@ app.use('/messages', messageRoutes)
 app.use('/requests', requestRoutes)
 app.use('/notifications', notificationRoutes)
 
+// notifications
+var admin = require("firebase-admin");
+var serviceAccount = require("./notification/csci4140-302fd-firebase-adminsdk-kr3kc-8b0aaf8433.json");
+admin.initializeApp({
+ credential: admin.credential.cert(serviceAccount)
+});
+
 // for http
 var httpServer = http.createServer(app);
 
