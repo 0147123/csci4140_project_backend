@@ -4,6 +4,7 @@ const Condition = require("../sequelize/models/Condition");
 const Item = require("../sequelize/models/Item");
 const Request = require("../sequelize/models/Request");
 const User = require("../sequelize/models/user");
+const Notification = require("../sequelize/models/Notification");
 
 const getRequests = async (req, res) => {
   try {
@@ -80,6 +81,15 @@ const createRequest = async (req, res) => {
         availableItemId: id,
       });
     });
+
+    const item = await Item.findByPk(itemId);
+    const user = await User.findByPk(uid);
+
+    await Notification.create({
+      content: 'You have a new request on your item ' + item.name + ' from ' + user.username,
+      uid: item.uid,
+    });
+
     res.status(201).json({ message: 'Request created' });
   } catch (error) {
     console.log(error);
@@ -93,7 +103,15 @@ const updateRequestStatus = async (req, res) => {
 
   try {
     const request = await Request.findByPk(id);
-    const item = await Item.findByPk(request.itemId);
+    const item = await Item.findByPk(request.itemId,
+      {
+        include: [
+          {
+            model: User,
+            attributes: ['uid', 'username'],
+          },
+        ],
+      });
     const availableItem = await Item.findByPk(request.availableItemId);
 
     if (status === 'accepted') {
@@ -131,6 +149,18 @@ const updateRequestStatus = async (req, res) => {
       ],
     });
 
+    if (status === 'accepted') {
+      await Notification.create({
+        content: 'Your request on the item ' + item.name + ' has been accepted by ' + item.User.username,
+        uid: request.uid,
+      });
+    } else {
+      await Notification.create({
+        content: 'Your request on the item ' + item.name + ' has been rejected by ' + item.User.username,
+        uid: request.uid,
+      });
+    }
+
     res.status(200).json({ request: result });
   } catch (error) {
     console.log(error)
@@ -156,6 +186,14 @@ const updateRequest = async (req, res) => {
         itemId,
         availableItemId: id,
       });
+    });
+
+    const item = await Item.findByPk(itemId);
+    const user = await User.findByPk(uid);
+
+    await Notification.create({
+      content: 'You have a new request on your item ' + item.name + ' from ' + user.username,
+      uid: item.uid,
     });
 
     res.status(200).json({ message: 'Requests updated'});

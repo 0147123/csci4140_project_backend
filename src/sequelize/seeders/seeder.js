@@ -9,6 +9,7 @@ const bcrypt = require('bcrypt');
 const Category = require('../models/Category');
 const Conversation = require('../models/Conversation');
 const Message = require('../models/Message');
+const Notification = require('../models/Notification');
 
 async function encryptPassword(password) {
     return bcrypt.hash(password, 10);
@@ -106,14 +107,14 @@ async function seed() {
             {
                 id: 1,
                 itemId: 1,
-                uid: 2,
+                uid: 3,
                 availableItemId: 2,
                 status: 'pending',
             },
             {
                 id: 2,
                 itemId: 2,
-                uid: 3,
+                uid: 2,
                 availableItemId: 1,
                 status: 'pending',
             },
@@ -160,6 +161,25 @@ async function seed() {
             })
             .catch((error) => {
                 console.error('Error creating messages:', error);
+            });
+
+        await Notification.bulkCreate([
+            {
+                id: 1,
+                uid: 2,
+                content: 'You have a new request on your item MacBook Pro from june',
+            },
+            {
+                id: 2,
+                uid: 3,
+                content: 'You have a new request on your item iPhone 12 from vincy',
+            },
+        ])
+            .then(() => {
+                console.log('Notifications created');
+            })
+            .catch((error) => {
+                console.error('Error creating notifications:', error);
             });
         
 

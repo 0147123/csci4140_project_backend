@@ -20,6 +20,10 @@ const Notification = sequelize.define('Notification', {
             key: 'uid',
         },
     },
+    status: {
+        type: DataTypes.ENUM('read', 'unread'),
+        defaultValue: 'unread',
+    },
     createdAt: {
         type: DataTypes.DATE,
         defaultValue: DataTypes.NOW,
