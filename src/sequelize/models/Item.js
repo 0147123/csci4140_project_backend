@@ -1,7 +1,7 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
 const Condition = require('./Condition');
-const User = require('./user');
+const User = require('./User');
 const Category = require('./Category');
 
 const Item = sequelize.define('Item', {
