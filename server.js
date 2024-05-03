@@ -5,14 +5,14 @@ const bodyParser = require('body-parser')
 const cors = require('cors')
 const http = require('http')
 const cookieParser = require('cookie-parser')
-const sequelize = require('./sequelize/config/database')
-const userRoutes = require('./routes/userRoutes')
-const commentRoutes = require('./routes/commentRoutes')
-const itemRoutes = require('./routes/itemRoutes')
-const messageRoutes = require('./routes/messageRoutes')
-const requestRoutes = require('./routes/requestRoutes')
-const notificationRoutes = require('./routes/notificationRoutes')
-const multerMiddleware = require('./middlewares/multer')
+const sequelize = require('./src/sequelize/config/database')
+const userRoutes = require('./src/routes/userRoutes')
+const commentRoutes = require('./src/routes/commentRoutes')
+const itemRoutes = require('./src/routes/itemRoutes')
+const messageRoutes = require('./src/routes/messageRoutes')
+const requestRoutes = require('./src/routes/requestRoutes')
+const notificationRoutes = require('./src/routes/notificationRoutes')
+const multerMiddleware = require('./src/middlewares/multer')
 
 const app = express()
 const devPort = 3000
@@ -51,7 +51,7 @@ app.use('/notifications', notificationRoutes)
 
 // notifications
 var admin = require("firebase-admin");
-var serviceAccount = require("./notification/csci4140-302fd-firebase-adminsdk-kr3kc-8b0aaf8433.json");
+var serviceAccount = require("./src/notification/csci4140-302fd-firebase-adminsdk-kr3kc-8b0aaf8433.json");
 admin.initializeApp({
  credential: admin.credential.cert(serviceAccount)
 });
