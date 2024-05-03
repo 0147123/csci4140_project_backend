@@ -2,7 +2,7 @@
 const { Op } = require('sequelize');
 const Conversation = require('../sequelize/models/Conversation');
 const Message = require('../sequelize/models/Message');
-const User = require('../sequelize/models/user');
+const User = require('../sequelize/models/User');
 
 const getConversations = async (req, res) => {
   try {

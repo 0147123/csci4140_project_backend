@@ -3,7 +3,7 @@ const Category = require("../sequelize/models/Category");
 const Condition = require("../sequelize/models/Condition");
 const Item = require("../sequelize/models/Item");
 const Request = require("../sequelize/models/Request");
-const User = require("../sequelize/models/user");
+const User = require("../sequelize/models/User");
 const Notification = require("../sequelize/models/Notification");
 const admin = require('firebase-admin');
 

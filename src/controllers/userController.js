@@ -1,4 +1,4 @@
-const User = require("../sequelize/models/user");
+const User = require("../sequelize/models/User");
 
 
 const userLogin = async (req, res) => {
@@ -32,6 +32,7 @@ const userLogin = async (req, res) => {
 
 const userRegister = async (req, res) => {
   try {
+    console.log(req.body)
     // check if the body format is correct
     if (!req.body.email || !req.body.password || !req.body.username) return res.status(400).send("Bad request")
 
@@ -44,7 +45,15 @@ const userRegister = async (req, res) => {
     if (userExist) return res.status(409).send("Email already registered")
 
 
-    const user = await User.create(req.body);
+    await User.create(req.body);
+
+    // get created user
+    const user = await User.findOne({
+      where: {
+        email: req.body.email,
+      },
+      attributes: ['username', 'email', 'icon', 'role'],
+    });
     
     res.status(200).json({ user });
   } catch (error) {

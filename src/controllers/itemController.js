@@ -2,7 +2,7 @@ const { Op } = require('sequelize');
 const Category = require('../sequelize/models/Category');
 const Condition = require('../sequelize/models/Condition');
 const Item = require('../sequelize/models/Item');
-const User = require('../sequelize/models/user');
+const User = require('../sequelize/models/User');
 const Request = require('../sequelize/models/Request');
 // itemController.js
 const getAllItems = async (req, res) => {
