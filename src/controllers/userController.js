@@ -35,6 +35,15 @@ const userRegister = async (req, res) => {
     // check if the body format is correct
     if (!req.body.email || !req.body.password || !req.body.username) return res.status(400).send("Bad request")
 
+    // check if email is already registered
+    const userExist = await User.findOne({
+      where: {
+        email: req.body.email,
+      },
+    });
+    if (userExist) return res.status(409).send("Email already registered")
+
+
     const user = await User.create(req.body);
     
     res.status(200).json({ user });
