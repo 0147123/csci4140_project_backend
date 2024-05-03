@@ -8,6 +8,8 @@ const Request = require('../sequelize/models/Request');
 const getAllItems = async (req, res) => {
   const { categoryId, keyword, status, uid } = req.query;
 
+  console.log(req.query);
+
   try {
     const items = await Item.findAll({
       where: {

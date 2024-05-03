@@ -2,7 +2,7 @@ const User = require("../sequelize/models/User");
 
 
 const userLogin = async (req, res) => {
-  const { email, password } = req.body;
+  const { email, password, fcmToken } = req.body;
 
   // check if email and password are provided
   if (!email || !password) return res.status(400).send("Bad request")
@@ -16,13 +16,20 @@ const userLogin = async (req, res) => {
         password: password,
         verified: 1,
       },
-      attributes: ['username', 'email', 'icon', 'role'],
+      attributes: ['uid', 'username', 'email', 'icon', 'role'],
     });
+
+
+    // if user does not exist or password is incorrect
     if (!user) return res.status(401).send("Unauthorized")
 
-    // check if password is correct
-    // if (user.password !== password) return res.status(401).send("Unauthorized")
-    
+    // add the fcmToken to the user
+    await User.update({ fcmToken: fcmToken }, {
+      where: {
+        email: email,
+      },
+    });
+
     res.status(200).json({ user });
   } catch (error) {
     res.status(500).json({ message: 'Failed to login.' });
