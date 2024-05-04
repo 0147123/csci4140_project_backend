@@ -176,7 +176,7 @@ const updateRequestStatus = async (req, res) => {
         title: 'New Request',
         body: 'Your request on the item ' + item.name + ' has been ' + status + ' by ' + item.User.username,
       },
-      token: result.User.fcmToken,
+      token: result.availableItem.User.fcmToken,
     })
 
     res.status(200).json({ request: result });

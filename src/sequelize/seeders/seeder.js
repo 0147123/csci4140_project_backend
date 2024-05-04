@@ -1,7 +1,7 @@
 // node [path]
 const sequelize = require('../config/database');
 const Condition = require('../models/Condition');
-const User = require('../models/user');
+const User = require('../models/User');
 const Item = require('../models/Item');
 const Request = require('../models/Request');
 
