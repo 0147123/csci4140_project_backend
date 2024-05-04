@@ -104,7 +104,7 @@ const createRequest = async (req, res) => {
         title: 'New Request',
         body: 'You have a new request on your item ' + item.name + ' from ' + user.username,
       },
-      token: "cEvpG3wdSJ6O4JSCSpg-Ea:APA91bGqnbuhfIZBWnSP7RtwdFD4fWb0Q2jdu7L3Y4gfDDrtNLaotwdgPFz52opu8adjLhKphveCvM2XWUrfMbfKD16VrbNLSnaeClJ7_VlbRzeIAQ9wcEqPntEBpuRmUeQiTCWM7Upn",
+      token: item.User.fcmToken,
     })
 
     res.status(201).json({ message: 'Request created' });
@@ -151,7 +151,7 @@ const updateRequestStatus = async (req, res) => {
           include: [
             {
               model: User,
-              attributes: ['uid', 'username'],
+              attributes: ['uid', 'username', 'fcmToken'],
             },
             {
               model: Condition,
@@ -176,7 +176,7 @@ const updateRequestStatus = async (req, res) => {
         title: 'New Request',
         body: 'Your request on the item ' + item.name + ' has been ' + status + ' by ' + item.User.username,
       },
-      token: "cEvpG3wdSJ6O4JSCSpg-Ea:APA91bGqnbuhfIZBWnSP7RtwdFD4fWb0Q2jdu7L3Y4gfDDrtNLaotwdgPFz52opu8adjLhKphveCvM2XWUrfMbfKD16VrbNLSnaeClJ7_VlbRzeIAQ9wcEqPntEBpuRmUeQiTCWM7Upn",
+      token: result.User.fcmToken,
     })
 
     res.status(200).json({ request: result });
@@ -206,7 +206,15 @@ const updateRequest = async (req, res) => {
       });
     });
 
-    const item = await Item.findByPk(itemId);
+    const item = await Item.findByPk(itemId,
+      {
+        include: [
+          {
+            model: User,
+            attributes: ['fcmToken'],
+          },
+        ],
+      });
     const user = await User.findByPk(uid);
 
     await Notification.create({
@@ -219,7 +227,7 @@ const updateRequest = async (req, res) => {
         title: 'New Request',
         body: 'You have a new request on your item ' + item.name + ' from ' + user.username,
       },
-      token: "cEvpG3wdSJ6O4JSCSpg-Ea:APA91bGqnbuhfIZBWnSP7RtwdFD4fWb0Q2jdu7L3Y4gfDDrtNLaotwdgPFz52opu8adjLhKphveCvM2XWUrfMbfKD16VrbNLSnaeClJ7_VlbRzeIAQ9wcEqPntEBpuRmUeQiTCWM7Upn",
+      token: item.User.fcmToken,
     })
 
     res.status(200).json({ message: 'Requests updated' });
