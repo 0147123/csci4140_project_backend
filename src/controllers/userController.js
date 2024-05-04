@@ -73,7 +73,7 @@ const userRegister = async (req, res) => {
 const getAllUsers = async (req, res) => {
   try {
     const users = await User.findAll({
-      attributes: ['username', 'email', 'icon', 'role'],
+      attributes: ['uid', 'username', 'email', 'icon', 'role'],
     });
     res.status(200).json({ users });
   } catch (error) {
@@ -87,7 +87,7 @@ const getUser = async (req, res) => {
 
   try {
     const user = await User.findByPk(id, {
-      attributes: ['username', 'email', 'icon', 'role'],
+      attributes: ['uid', 'username', 'email', 'icon', 'role'],
     });
     res.status(200).json({ user });
   } catch (error) {
