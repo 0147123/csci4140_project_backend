@@ -61,9 +61,9 @@ async function seed() {
 
         // Create users
         await User.bulkCreate([
-            { uid: 1, role: 'admin', username: 'admin', email: 'admin@example.com', password: await encryptPassword('admin')},
-            { uid: 2, username: 'vincy', email: 'vincy@example.com', password: await encryptPassword('test123321') },
-            { uid: 3, username: 'june', email: 'june@example.com', password: await encryptPassword('test123321') },
+            { uid: 1, role: 'admin', username: 'admin', email: 'admin@example.com', password: 'admin'},
+            { uid: 2, username: 'vincy', email: 'vincy@example.com', password: 'test123321'},
+            { uid: 3, username: 'june', email: 'june@example.com', password: 'test123321' },
         ])
             .then(() => {
                 console.log('Users created');
