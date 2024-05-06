@@ -95,9 +95,30 @@ const getUser = async (req, res) => {
   }
 } 
 
+const userLogout = async (req, res) => {
+  const { email } = req.body;
+
+  try {
+    // check if email exists
+    await User.update({ fcmToken: null }, {
+      where: {
+        email: email,
+      },
+    });
+
+    res.status(200).send("Logged out successfully")
+  }
+
+  catch (error) {
+    res.status(500).json({ message: 'Failed to logout.' });
+  }
+
+}
+
 module.exports = {
   getAllUsers,
   getUser,
   userLogin,
   userRegister,
+  userLogout,
 };
