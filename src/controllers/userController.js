@@ -115,10 +115,41 @@ const userLogout = async (req, res) => {
 
 }
 
+const userUpdate = async (req, res) => {
+  const { email, username, uid } = req.body;
+
+  try {
+    // check if email exists
+    await User.update({ username, email }, {
+      where: {
+        uid: uid,
+      },
+    });
+
+    const user = await User.findOne({
+      where: {
+        uid: uid,
+      },
+      attributes: ['uid', 'username', 'email', 'icon', 'role', 'fcmToken'],
+    });
+
+    console.log(user)
+
+    res.status(200).json({ user });
+  }
+
+  catch (error) {
+    console.log(error)
+    res.status(500).json({ message: 'Failed to update.' });
+  }
+
+}
+
 module.exports = {
   getAllUsers,
   getUser,
   userLogin,
   userRegister,
   userLogout,
+  userUpdate,
 };
